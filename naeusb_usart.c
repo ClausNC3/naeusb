@@ -889,47 +889,11 @@ void my_callback_config(uint8_t port, usb_cdc_line_coding_t * cfg)
 {
 	usart_driver *driver = get_nth_available_driver(port);
 
-    // if (driver->cdc_enabled && driver->cdc_settings_change) {
-        uint32_t baud = cfg->dwDTERate;
-
-        uint8_t stop_bits = ((uint32_t)cfg->bCharFormat) << 12;
-        uint8_t dbits = ((uint32_t)cfg->bDataBits - 5) << 6;
-        uint16_t parity_type = US_MR_PAR_NO;
-        switch(cfg->bParityType) {
-            case CDC_PAR_NONE:
-            parity_type = US_MR_PAR_NO;
-            break;
-            case CDC_PAR_ODD:
-            parity_type = US_MR_PAR_ODD;
-            break;
-            case CDC_PAR_EVEN:
-            parity_type = US_MR_PAR_EVEN;
-            break;
-            case CDC_PAR_MARK:
-            parity_type = US_MR_PAR_MARK;
-            break;
-            case CDC_PAR_SPACE:
-            parity_type = US_MR_PAR_SPACE;
-            break;
-            default:
-            return;
-        }
-
-
-		usart_enableIO(driver);
-        configure_usart(driver, baud, stop_bits, parity_type, dbits);
-        usart_enable_rx(driver->usart);
-        usart_enable_tx(driver->usart);
-
-        usart_enable_interrupt(driver->usart, UART_IER_RXRDY);
-		// if (!(usart_get_interrupt_mask(driver->usart) & UART_IER_RXRDY)) {
-		// 	usart_enable_rx(driver->usart);
-		// 	usart_enable_tx(driver->usart);
-
-		// 	usart_enable_interrupt(driver->usart, UART_IER_RXRDY);
-		// }
-		
-    // }
+	usart_enableIO(driver);
+	configure_usart(driver, cfg->dwDTERate, cfg->bCharFormat, cfg->bParityType, cfg->bDataBits);
+	usart_enable_rx(driver->usart);
+	usart_enable_tx(driver->usart);
+	usart_enable_interrupt(driver->usart, UART_IER_RXRDY);
 }
 
 // Handle USB OUT
